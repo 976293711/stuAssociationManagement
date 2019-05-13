@@ -14,9 +14,11 @@ use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+
 class UserController extends BaseController
 {
-    const BASE_ROLE_ID = 17;
+    const BASE_ROLE_ID = 1;
     /**
      * 获取用户列表
      */
@@ -80,16 +82,42 @@ class UserController extends BaseController
      * 用户注册
      * @return \App\Http\Controllers\StuAdmin\Response
      */
-    public function store(){
+    public function store(Request $request){
         $params = request('params');
-        $validator = \Validator::make($params, [
-            'name' => 'required|string',
-            'email' => 'required',
+
+        $rules = [
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('users', 'name'),
+            ],
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users', 'email'),
+            ],
             'password' => 'required'
-        ]);
-        if ($validator->fails()) {
-            return $this->failResponse($validator->errors());
+        ];
+
+        $messages = [
+            'email.unique' => '邮箱已存在',
+            'name.unique'  => '用户名已存在'
+        ];
+
+        try{
+            $this->validate($request, $rules, $messages);
+        }catch (\Exception $e){
+            return $this->failResponse('Error '.$e->getMessage());
         }
+
+//        $validator = \Validator::make($params, [
+//            'name' => 'required|string',
+//            'email' => 'required',
+//            'password' => 'required'
+//        ]);
+//        if ($validator->fails()) {
+//            return $this->failResponse($validator->errors());
+//        }
 
         $is_exists = DB::table('users')
             ->where('email', $params['email'])

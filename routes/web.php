@@ -40,6 +40,24 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/check_user', 'StuAdmin\Rbac\UserController@checkUser');
         });
     });
+
+    Route::group(['prefix' => 'stu_ass'], function () {
+
+        Route::group(['prefix' => 'info'], function (){
+            Route::get('/get_list', 'StuAss\AssociationManagementController@getAssList');
+            Route::post('/upload_img', 'StuAss\AssociationManagementController@uploadImage');
+        });
+        Route::resource('info', 'StuAss\AssociationManagementController');
+
+        Route::group(['prefix' => 'notice'], function (){
+            Route::get('/get/{ass_id}', 'StuAss\AssNoticeController@getNoticeByAssID');
+            Route::post('/save', 'StuAss\AssNoticeController@saveNotice');
+        });
+        Route::group(['prefix' => 'member'], function (){
+            Route::get('/get/{ass_id}', 'StuAss\AssMemberController@getAuditByAssId');
+            Route::post('/save', 'StuAss\AssMemberController@saveAudit');
+        });
+    });
 });
 
 Route::group(['prefix' => 'auth'], function () {

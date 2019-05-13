@@ -61,6 +61,9 @@ class AuthController extends BaseController
     public function getMenuList(Request $request){
         $userInfo = $request->session()->get('user');
         $user_id = $userInfo['user_id'];
+        if($user_id == null){
+            return $this->successResponse('null');
+        }
         $role = User::find($user_id)->roles;
         $menuData = [];
         foreach ($role as $item){
